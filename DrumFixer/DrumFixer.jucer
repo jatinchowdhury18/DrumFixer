@@ -14,6 +14,8 @@
           <FILE id="G2Vvgn" name="TransientDetector.h" compile="0" resource="0"
                 file="Source/DSP/LevelDetectors/TransientDetector.h"/>
         </GROUP>
+        <FILE id="pszvFd" name="DecayFilter.cpp" compile="1" resource="0" file="Source/DSP/DecayFilter.cpp"/>
+        <FILE id="N0Phgg" name="DecayFilter.h" compile="0" resource="0" file="Source/DSP/DecayFilter.h"/>
         <FILE id="jjxkly" name="FFTUtils.cpp" compile="1" resource="0" file="Source/DSP/FFTUtils.cpp"/>
         <FILE id="worTzF" name="FFTUtils.h" compile="0" resource="0" file="Source/DSP/FFTUtils.h"/>
       </GROUP>

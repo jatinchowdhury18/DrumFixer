@@ -3,6 +3,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DSP/FFTUtils.h"
 #include "DSP/LevelDetectors/TransientDetector.h"
+#include "DSP/DecayFilter.h"
 
 class DrumFixerAudioProcessor : public AudioProcessor,
                                 public ChangeBroadcaster
@@ -44,13 +45,17 @@ public:
     bool isListening() { return listening; }
     void toggleListening();
 
+    void addDecayFilter (DecayFilter::Params& params);
+    const OwnedArray<DecayFilter>& getDecayFilters() const { return decayFilts; }
+
 private:
     FFTUtils fftUtils;
 
     TransientDetector tDetect;
-
     bool listening = false;
     bool transDetected = false;
+
+    OwnedArray<DecayFilter> decayFilts;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrumFixerAudioProcessor)
 };

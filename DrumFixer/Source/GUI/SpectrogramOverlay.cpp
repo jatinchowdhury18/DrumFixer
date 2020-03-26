@@ -1,62 +1,84 @@
 #include "SpectrogramOverlay.h"
 #include "../DSP/FFTUtils.h"
 
-SpectrogramOverlay::SpectrogramOverlay()
+SpectrogramOverlay::SpectrogramOverlay (DrumFixerAudioProcessor& p) :
+    proc (p)
 {
     addChildComponent (cursorLabel);
     cursorLabel.setFont (12.0f);
     cursorLabel.setJustificationType (Justification::right);
 }
 
-void SpectrogramOverlay::paint (Graphics& g)
+void SpectrogramOverlay::drawFreqLine (Graphics& g, float y, float dim)
 {
-    auto drawLine = [=, &g] (float y, float dim = 8.0f)
-    {
-        const auto w = (float) getWidth();
-        g.drawLine (0.0f, y, w, y, 2.0f);
+    const auto w = (float) getWidth();
+    g.drawLine (0.0f, y, w, y, 2.0f);
 
-        Path lTri;
-        lTri.addTriangle (0.0f, y + dim, 0.0f, y - dim, dim, y);
-        g.fillPath (lTri);
+    Path lTri;
+    lTri.addTriangle (0.0f, y + dim, 0.0f, y - dim, dim, y);
+    g.fillPath (lTri);
 
-        Path rTri;
-        rTri.addTriangle (w, y + dim, w, y - dim, w - dim, y);
-        g.fillPath (rTri);
-    };
+    Path rTri;
+    rTri.addTriangle (w, y + dim, w, y - dim, w - dim, y);
+    g.fillPath (rTri);
+}
 
-    auto drawWidthLine = [=, &g] (float top, float center, float x)
-    {
-        const auto height = 2 * (center - top);
-        g.drawLine (x, top, x, top + height, 2.0f);
+void SpectrogramOverlay::drawWidthLine (Graphics& g, float top, float center, float x)
+{
+    const auto height = 2 * (center - top);
+    g.drawLine (x, top, x, top + height, 2.0f);
 
-        const float dim = 5.0f;
-        g.drawLine (x - dim, top, x + dim, top, 1.0f);
-        g.drawLine (x - dim, top + height, x + dim, top + height, 1.0f);
-    };
+    const float dim = 5.0f;
+    g.drawLine (x - dim, top, x + dim, top, 1.0f);
+    g.drawLine (x - dim, top + height, x + dim, top + height, 1.0f);
+}
 
+void SpectrogramOverlay::drawCursor (Graphics& g)
+{
     g.setColour (Colours::lightblue);
-
     if (state == ChooseFreq)
     {
         if (mouseY > 0.0f)
-            drawLine (mouseY);
+            drawFreqLine (g, mouseY);
     }
     else if (state == ChooseWidth)
     {
-        drawLine (freqY);
+        drawFreqLine (g, freqY);
 
         if (mouseY < freqY && mouseY > 0.0f)
-            drawWidthLine (mouseY, freqY, (float) getWidth() / 2);
+            drawWidthLine (g, mouseY, freqY, (float) getWidth() / 2);
     }
     else if (state == ChooseTau)
     {
-        drawLine (freqY);
+        drawFreqLine (g, freqY);
 
         if (mouseX > 0.0f)
-            drawWidthLine (widthY, freqY, mouseX);
+            drawWidthLine (g, widthY, freqY, mouseX);
         else
-            drawWidthLine (widthY, freqY, (float) getWidth() / 2);
+            drawWidthLine (g, widthY, freqY, (float) getWidth() / 2);
     }
+}
+
+void SpectrogramOverlay::drawFilters (Graphics& g)
+{
+    g.setColour (Colours::lightgrey);
+
+    auto& filters = proc.getDecayFilters();
+    for (auto& filt : filters)
+    {
+        auto& params = filt->getParams();
+        auto filtY = (float) FFTUtils::freqToY (params.centerFreq, (float) getHeight());
+        auto tauX = getXForTau (params.desiredT60);
+
+        drawFreqLine (g, filtY);
+        drawWidthLine (g, getYForWidth (params.bandwidth, params.centerFreq), filtY, tauX);
+    }
+}
+
+void SpectrogramOverlay::paint (Graphics& g)
+{
+    drawFilters (g);
+    drawCursor (g);
 
     g.setColour (Colours::white);
     g.drawRect (getLocalBounds().toFloat(), 2.0f);
@@ -67,7 +89,7 @@ void SpectrogramOverlay::mouseMove (const MouseEvent& e)
     cursorLabel.setVisible (true);
     mouseX = (float) e.x;
     mouseY = (float) e.y;
-    resetLabel();
+    updateLabel();
     repaint();
 }
 
@@ -94,15 +116,37 @@ void SpectrogramOverlay::mouseUp (const MouseEvent& e)
         break;
 
     case ChooseTau:
+        createNewFilter();
         state = ChooseFreq;
         break;
     }
     
-    resetLabel();
+    updateLabel();
     repaint();
 }
 
-void SpectrogramOverlay::resetLabel()
+float SpectrogramOverlay::getTauForX (float x)
+{
+    return 2.0f * pow (x / (float) getWidth(), 2.0f);
+}
+
+float SpectrogramOverlay::getXForTau (float tau)
+{
+    return pow (tau / 2.0f, 1.0f / 2.0f) * getWidth();
+}
+
+float SpectrogramOverlay::getWidthForY (float y, float center)
+{
+    return 2.0f * jmax (FFTUtils::yToFreq (y, (float) getHeight())
+        - FFTUtils::yToFreq (center, (float) getHeight()), 0.0f);
+}
+
+float SpectrogramOverlay::getYForWidth (float bandwidth, float centerFreq)
+{
+    return (float) FFTUtils::freqToY((bandwidth / 2.0f) + centerFreq, (float) getHeight());
+}
+
+void SpectrogramOverlay::updateLabel()
 {
     if (state == ChooseFreq)
     {
@@ -116,9 +160,7 @@ void SpectrogramOverlay::resetLabel()
 
     if (state == ChooseWidth)
     {
-        auto widthHz = jmax (FFTUtils::yToFreq (mouseY, (float) getHeight())
-            - FFTUtils::yToFreq (freqY, (float) getHeight()), 0.0f);
-
+        auto widthHz = getWidthForY (mouseY, freqY);
         cursorLabel.setText (String (widthHz, 2) + " Hz", dontSendNotification);
 
         const int width = 100;
@@ -128,7 +170,7 @@ void SpectrogramOverlay::resetLabel()
 
     if (state == ChooseTau)
     {
-        auto tauSeconds = 2.0f * pow (mouseX / (float) getWidth(), 3.0f);
+        auto tauSeconds = getTauForX (mouseX);
 
         cursorLabel.setText (String (tauSeconds, 2) + " sec", dontSendNotification);
 
@@ -136,4 +178,14 @@ void SpectrogramOverlay::resetLabel()
         const int height = 30;
         cursorLabel.setBounds (getWidth() - width, (int) freqY - height, width, height);
     }
+}
+
+void SpectrogramOverlay::createNewFilter()
+{
+    auto freqHz = FFTUtils::yToFreq (freqY, (float) getHeight());
+    auto widthHz = getWidthForY (mouseY, freqY);
+    auto tauSeconds = getTauForX (mouseX);
+
+    DecayFilter::Params params (freqHz, widthHz, tauSeconds);
+    proc.addDecayFilter (params);
 }

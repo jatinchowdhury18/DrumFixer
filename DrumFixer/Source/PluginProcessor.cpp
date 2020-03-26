@@ -149,6 +149,11 @@ void DrumFixerAudioProcessor::toggleListening()
     sendChangeMessage();
 }
 
+void DrumFixerAudioProcessor::addDecayFilter (DecayFilter::Params& params)
+{
+    decayFilts.add (new DecayFilter (params));
+}
+
 bool DrumFixerAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)

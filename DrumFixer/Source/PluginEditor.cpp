@@ -4,7 +4,8 @@
 DrumFixerAudioProcessorEditor::DrumFixerAudioProcessorEditor (DrumFixerAudioProcessor& p) :
     AudioProcessorEditor (&p),
     processor (p),
-    specgram (p.getFFT())
+    specgram (p.getFFT()),
+    overlay (p)
 {
     setSize (800, 450);
     

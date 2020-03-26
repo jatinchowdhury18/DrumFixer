@@ -82,6 +82,7 @@ void DrumFixerAudioProcessor::changeProgramName (int index, const String& newNam
 
 void DrumFixerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    fftUtils.setSampleRate (sampleRate);
 }
 
 void DrumFixerAudioProcessor::releaseResources()

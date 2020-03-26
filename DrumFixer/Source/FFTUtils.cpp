@@ -1,5 +1,11 @@
 #include "FFTUtils.h"
 
+namespace
+{
+    constexpr float lowFreq = 40.0f;
+    constexpr float highFreq = 20000.0f;
+};
+
 FFTUtils::FFTUtils() :
     forwardFFT (fftOrder)
 {
@@ -45,19 +51,37 @@ void FFTUtils::drawNextLineOfSpectrogram (Image& spectrogramImage)
 
     // then render our FFT data..
     forwardFFT.performFrequencyOnlyForwardTransform (fftData);
-    const auto max = FloatVectorOperations::findMaximum (fftData, fftSize/2);
     const float minDB = -100.0f;
     for (int k = 0; k < fftSize/2; ++k)
-        fftDataDB[k] = Decibels::gainToDecibels (fftData[k] / max, minDB);
+        fftDataDB[k] = Decibels::gainToDecibels (fftData[k] / 200, minDB);
 
-    for (auto y = 1; y < imageHeight; ++y)
+    const float binWidth = sampleRate / (float) fftSize;
+
+    for (auto y = 0; y < imageHeight; ++y)
     {
-        auto skewedProportionY = 1.0f - std::exp (std::log (y / (float) imageHeight) * 0.2f);
-        auto fftDataIndex = jlimit (0, fftSize / 2, (int) (skewedProportionY * fftSize / 2));
-        auto level = jmap (fftDataDB[fftDataIndex], minDB, 0.0f, 0.0f, 1.0f);
+        const auto freq = yToFreq ((float) y, (float) imageHeight);
+        const auto fftIdx = jmin (freq / binWidth, (float) fftSize / 2);
+        auto lower = fftDataDB[int (floor (fftIdx))];
+        auto upper = fftDataDB[int (ceil (fftIdx))];
+        const auto frac = fftIdx - floor (fftIdx);
+        auto interp = upper * frac + lower * (1.0f - frac);
 
-        spectrogramImage.setPixelAt (rightHandEdge, y, Colour::fromHSV (level, 1.0f, level, 1.0f));
+        auto level = jmap (interp, minDB, 0.0f, 0.0f, 1.0f);
+        auto colour = inferno[int (level * 256)];
+
+        spectrogramImage.setPixelAt (rightHandEdge, y,
+            Colour::fromFloatRGBA (colour[0], colour[1], colour[2], 1.0f));
     }
 
     nextFFTBlockReady = false;
+}
+
+float FFTUtils::yToFreq (float y, float height)
+{
+    return lowFreq * pow ((highFreq / lowFreq), 1.0f - (y / height));
+}
+
+int FFTUtils::freqToY (float freq, float height)
+{
+    return int ((1.0f - (log (freq / lowFreq) / log (highFreq / lowFreq))) * height);
 }

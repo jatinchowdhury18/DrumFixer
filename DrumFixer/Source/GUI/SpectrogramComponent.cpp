@@ -44,7 +44,4 @@ void SpectrogramComponent::paint (Graphics& g)
     g.setOpacity (1.0f);
     if (spectrogramImage.get() != nullptr)
         g.drawImage (*spectrogramImage.get(), getLocalBounds().toFloat());
-
-    g.setColour (Colours::white);
-    g.drawRect (getLocalBounds().toFloat(), 2.0f);
 }

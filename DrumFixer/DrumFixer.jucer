@@ -17,10 +17,16 @@
         <FILE id="jjxkly" name="FFTUtils.cpp" compile="1" resource="0" file="Source/DSP/FFTUtils.cpp"/>
         <FILE id="worTzF" name="FFTUtils.h" compile="0" resource="0" file="Source/DSP/FFTUtils.h"/>
       </GROUP>
-      <FILE id="ppRODO" name="SpectrogramComponent.cpp" compile="1" resource="0"
-            file="Source/SpectrogramComponent.cpp"/>
-      <FILE id="Fb6JXT" name="SpectrogramComponent.h" compile="0" resource="0"
-            file="Source/SpectrogramComponent.h"/>
+      <GROUP id="{2046BD53-9C38-822F-9D71-5F027597197A}" name="GUI">
+        <FILE id="pbfBOt" name="SpectrogramComponent.cpp" compile="1" resource="0"
+              file="Source/GUI/SpectrogramComponent.cpp"/>
+        <FILE id="j3ltYr" name="SpectrogramComponent.h" compile="0" resource="0"
+              file="Source/GUI/SpectrogramComponent.h"/>
+        <FILE id="OiPibh" name="SpectrogramOverlay.cpp" compile="1" resource="0"
+              file="Source/GUI/SpectrogramOverlay.cpp"/>
+        <FILE id="o4bW1X" name="SpectrogramOverlay.h" compile="0" resource="0"
+              file="Source/GUI/SpectrogramOverlay.h"/>
+      </GROUP>
       <FILE id="xV7icx" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="dS6lsY" name="PluginProcessor.h" compile="0" resource="0"

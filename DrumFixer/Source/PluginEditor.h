@@ -2,7 +2,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "SpectrogramComponent.h"
+#include "GUI/SpectrogramComponent.h"
+#include "GUI/SpectrogramOverlay.h"
 
 class DrumFixerAudioProcessorEditor : public AudioProcessorEditor,
                                       private ChangeListener
@@ -22,6 +23,7 @@ private:
     DrumFixerAudioProcessor& processor;
 
     SpectrogramComponent specgram;
+    SpectrogramOverlay overlay;
 
     TextButton listenButton { "Listen" };
 

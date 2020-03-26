@@ -11,6 +11,8 @@ DrumFixerAudioProcessorEditor::DrumFixerAudioProcessorEditor (DrumFixerAudioProc
     processor.addChangeListener (this);
 
     addAndMakeVisible (specgram);
+    addAndMakeVisible (overlay);
+    overlay.setMouseCursor (MouseCursor::NoCursor);
 
     addAndMakeVisible (listenButton);
     listenButton.onClick = [=] { listenButtonPressed(); };
@@ -29,6 +31,7 @@ void DrumFixerAudioProcessorEditor::resized()
 {
     const int pad = 10;
     specgram.setBounds (pad, pad, getWidth() / 2 - 2*pad, getHeight() - 2*pad);
+    overlay.setBounds (specgram.getBounds());
 
     listenButton.setBounds (410, 10, 100, 30);
 }

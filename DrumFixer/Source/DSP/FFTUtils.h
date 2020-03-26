@@ -12,8 +12,8 @@ public:
     void pushNextSampleIntoFifo (float sample) noexcept;
     void setSampleRate (double sr) { sampleRate = (float) sr; }
 
-    float yToFreq (float y, float height);
-    int freqToY (float freq, float height);
+    static float yToFreq (float y, float height);
+    static int freqToY (float freq, float height);
 
     bool isFFTReady() { return nextFFTBlockReady; }
     void drawNextLineOfSpectrogram (Array<Colour>& data, int height);

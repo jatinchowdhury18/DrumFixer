@@ -1,0 +1,15 @@
+# JUCE content
+Builds/
+JuceLibraryCode/
+
+# Windows Temp Cache Files
+[Tt]humbs.db
+
+# MacOS Finder stuff
+.DS_Dtore
+*.DS_Store
+*.swp
+*~
+
+# Visual Studio Code Files
+.vscode

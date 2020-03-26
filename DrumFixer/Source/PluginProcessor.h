@@ -4,7 +4,8 @@
 #include "DSP/FFTUtils.h"
 #include "DSP/LevelDetectors/TransientDetector.h"
 
-class DrumFixerAudioProcessor  : public AudioProcessor
+class DrumFixerAudioProcessor : public AudioProcessor,
+                                public ChangeBroadcaster
 {
 public:
     DrumFixerAudioProcessor();
@@ -40,10 +41,16 @@ public:
 
     FFTUtils& getFFT() {  return fftUtils; }
 
+    bool isListening() { return listening; }
+    void toggleListening();
+
 private:
     FFTUtils fftUtils;
 
     TransientDetector tDetect;
+
+    bool listening = false;
+    bool transDetected = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrumFixerAudioProcessor)
 };

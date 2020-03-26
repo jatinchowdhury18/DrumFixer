@@ -119,18 +119,33 @@ void DrumFixerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuff
 {
     ScopedNoDenormals noDenormals;
     
-    fftUtils.processBlock (buffer);
-
-    if (tDetect.isTransientInBuffer (buffer))
+    if (listening)
     {
-        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        if (tDetect.isTransientInBuffer (buffer))
         {
-            for (int n = 0; n < buffer.getNumSamples(); ++n)
-                buffer.setSample (ch, n, 1.0f);
+            transDetected = true;
+            fftUtils.processBlock (buffer);
+        }
+        else if (transDetected)
+        {
+            toggleListening();
         }
     }
-    else
-        buffer.clear();
+}
+
+void DrumFixerAudioProcessor::toggleListening()
+{
+    if (! listening) // start listening
+    {
+        listening = true;
+        transDetected = false;
+    }
+    else // stop listening
+    {
+        listening = false;
+    }
+
+    sendChangeMessage();
 }
 
 bool DrumFixerAudioProcessor::hasEditor() const

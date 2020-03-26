@@ -1,8 +1,7 @@
 #include "SpectrogramComponent.h"
 
 SpectrogramComponent::SpectrogramComponent (FFTUtils& fft) :
-    fft (fft),
-    spectrogramImage (Image::RGB, 512, 512, true)
+    fft (fft)
 {
     setOpaque (true);
     startTimerHz (45);
@@ -12,9 +11,30 @@ void SpectrogramComponent::timerCallback()
 {
     if (fft.isFFTReady())
     {
-        fft.drawNextLineOfSpectrogram (spectrogramImage);
-        repaint();
+        Array<Colour> spectrogramLine;
+        fft.drawNextLineOfSpectrogram (spectrogramLine, specgramPixels);
+        specgramData.add (spectrogramLine);
     }
+}
+
+void SpectrogramComponent::clear()
+{
+    spectrogramImage.reset (nullptr);
+    specgramData.clear();
+    repaint();
+}
+
+void SpectrogramComponent::drawSpecgram()
+{
+    if (specgramData.size() == 0)
+        return;
+
+    spectrogramImage = std::make_unique<Image> (Image::RGB, specgramData.size(), specgramPixels, true);
+    for (int x = 0; x < specgramData.size(); ++x)
+        for (int y = 0; y < specgramPixels; ++y)
+            spectrogramImage->setPixelAt (x, y, specgramData[x][y]);
+
+    repaint();
 }
 
 void SpectrogramComponent::paint (Graphics& g)
@@ -22,5 +42,9 @@ void SpectrogramComponent::paint (Graphics& g)
     g.fillAll (Colours::black);
 
     g.setOpacity (1.0f);
-    g.drawImage (spectrogramImage, getLocalBounds().toFloat());
+    if (spectrogramImage.get() != nullptr)
+        g.drawImage (*spectrogramImage.get(), getLocalBounds().toFloat());
+
+    g.setColour (Colours::white);
+    g.drawRect (getLocalBounds().toFloat(), 2.0f);
 }

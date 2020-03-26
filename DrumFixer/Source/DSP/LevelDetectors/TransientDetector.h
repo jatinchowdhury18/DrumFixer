@@ -32,7 +32,10 @@ public:
         }
 
         if (detectBuffer.getMagnitude (0, buffer.getNumSamples()) > 5*noiseFloor)
+        {
+            count = 0;
             return true;
+        }
 
         // update noise floor (moving avg of rms values)
         float rms = 0.01f;
@@ -41,6 +44,13 @@ public:
 
         noiseFloor -= noiseFloor / (float) movingAvgN;
         noiseFloor += rms / (float) movingAvgN;
+
+        // if still in wait buffer, return true
+        if (count < countToWait)
+        {
+            count += buffer.getNumSamples();
+            return true;
+        }
 
         return false;
     }
@@ -51,6 +61,9 @@ private:
 
     float noiseFloor = Decibels::decibelsToGain (0.0f);
     const int movingAvgN = 20;
+
+    const int countToWait = 8192;
+    int count = countToWait;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransientDetector)
 };

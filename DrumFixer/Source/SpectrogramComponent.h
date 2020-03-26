@@ -10,12 +10,20 @@ public:
     SpectrogramComponent (FFTUtils& fft);
 
     void paint (Graphics& g) override;
+    void clear();
+    void drawSpecgram();
 
 private:
     void timerCallback() override;
 
+    enum
+    {
+        specgramPixels = 512,
+    };
+
     FFTUtils& fft;
-    Image spectrogramImage;
+    std::unique_ptr<Image> spectrogramImage;
+    Array<Array<Colour>> specgramData;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrogramComponent)
 };

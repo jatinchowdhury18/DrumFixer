@@ -16,12 +16,12 @@ public:
     int freqToY (float freq, float height);
 
     bool isFFTReady() { return nextFFTBlockReady; }
-    void drawNextLineOfSpectrogram (Image& spectrogramImage);
+    void drawNextLineOfSpectrogram (Array<Colour>& data, int height);
 
 private:
     enum
     {
-        fftOrder = 10,
+        fftOrder = 12,
         fftSize  = 1 << fftOrder
     };
 

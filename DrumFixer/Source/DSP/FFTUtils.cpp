@@ -41,15 +41,11 @@ void FFTUtils::pushNextSampleIntoFifo (float sample) noexcept
     fifo[fifoIndex++] = sample;
 }
 
-void FFTUtils::drawNextLineOfSpectrogram (Image& spectrogramImage)
+void FFTUtils::drawNextLineOfSpectrogram (Array<Colour>& data, int height)
 {
-    auto rightHandEdge = spectrogramImage.getWidth() - 1;
-    auto imageHeight   = spectrogramImage.getHeight();
+    const auto imageHeight = (float) height;
 
-    // first, shuffle our image leftwards by 1 pixel..
-    spectrogramImage.moveImageSection (0, 0, 1, 0, rightHandEdge, imageHeight);
-
-    // then render our FFT data..
+    // render FFT data...
     forwardFFT.performFrequencyOnlyForwardTransform (fftData);
     const float minDB = -100.0f;
     for (int k = 0; k < fftSize/2; ++k)
@@ -67,10 +63,8 @@ void FFTUtils::drawNextLineOfSpectrogram (Image& spectrogramImage)
         auto interp = upper * frac + lower * (1.0f - frac);
 
         auto level = jmap (interp, minDB, 0.0f, 0.0f, 1.0f);
-        auto colour = inferno[int (level * 256)];
-
-        spectrogramImage.setPixelAt (rightHandEdge, y,
-            Colour::fromFloatRGBA (colour[0], colour[1], colour[2], 1.0f));
+        auto colourVals = inferno[int (level * 256)];
+        data.add (Colour::fromFloatRGBA (colourVals[0], colourVals[1], colourVals[2], 1.0f));
     }
 
     nextFFTBlockReady = false;

@@ -1,7 +1,7 @@
 #ifndef SPECTROGRAMCOMPONENT_H_INCLUDED
 #define SPECTROGRAMCOMPONENT_H_INCLUDED
 
-#include "FFTUtils.h"
+#include "DSP/FFTUtils.h"
 
 class SpectrogramComponent : public Component,
                              private Timer

@@ -5,12 +5,22 @@
               cppLanguageStandard="17">
   <MAINGROUP id="gFEua7" name="DrumFixer">
     <GROUP id="{07456342-AEA9-751C-FB94-8215F1B80948}" name="Source">
+      <GROUP id="{3A650E98-E3FD-ADD7-26E2-603C74D7D626}" name="DSP">
+        <GROUP id="{BA6B5720-9382-0D49-BBDD-3FE1F69BEAE2}" name="LevelDetectors">
+          <FILE id="jeSPtP" name="BaseDetector.cpp" compile="1" resource="0"
+                file="Source/DSP/LevelDetectors/BaseDetector.cpp"/>
+          <FILE id="YS7Yd1" name="BaseDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/BaseDetector.h"/>
+          <FILE id="pa2QPp" name="PeakDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/PeakDetector.h"/>
+          <FILE id="G2Vvgn" name="TransientDetector.h" compile="0" resource="0"
+                file="Source/DSP/LevelDetectors/TransientDetector.h"/>
+        </GROUP>
+        <FILE id="jjxkly" name="FFTUtils.cpp" compile="1" resource="0" file="Source/DSP/FFTUtils.cpp"/>
+        <FILE id="worTzF" name="FFTUtils.h" compile="0" resource="0" file="Source/DSP/FFTUtils.h"/>
+      </GROUP>
       <FILE id="ppRODO" name="SpectrogramComponent.cpp" compile="1" resource="0"
             file="Source/SpectrogramComponent.cpp"/>
       <FILE id="Fb6JXT" name="SpectrogramComponent.h" compile="0" resource="0"
             file="Source/SpectrogramComponent.h"/>
-      <FILE id="k4foSy" name="FFTUtils.cpp" compile="1" resource="0" file="Source/FFTUtils.cpp"/>
-      <FILE id="GLdcl0" name="FFTUtils.h" compile="0" resource="0" file="Source/FFTUtils.h"/>
       <FILE id="xV7icx" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="dS6lsY" name="PluginProcessor.h" compile="0" resource="0"

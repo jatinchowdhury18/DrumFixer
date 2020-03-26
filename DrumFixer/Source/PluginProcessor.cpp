@@ -83,6 +83,8 @@ void DrumFixerAudioProcessor::changeProgramName (int index, const String& newNam
 void DrumFixerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     fftUtils.setSampleRate (sampleRate);
+
+    tDetect.prepare (sampleRate, getMainBusNumInputChannels(), samplesPerBlock);
 }
 
 void DrumFixerAudioProcessor::releaseResources()
@@ -118,6 +120,17 @@ void DrumFixerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuff
     ScopedNoDenormals noDenormals;
     
     fftUtils.processBlock (buffer);
+
+    if (tDetect.isTransientInBuffer (buffer))
+    {
+        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        {
+            for (int n = 0; n < buffer.getNumSamples(); ++n)
+                buffer.setSample (ch, n, 1.0f);
+        }
+    }
+    else
+        buffer.clear();
 }
 
 bool DrumFixerAudioProcessor::hasEditor() const

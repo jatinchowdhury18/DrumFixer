@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "FFTUtils.h"
+#include "DSP/FFTUtils.h"
+#include "DSP/LevelDetectors/TransientDetector.h"
 
 class DrumFixerAudioProcessor  : public AudioProcessor
 {
@@ -41,6 +42,8 @@ public:
 
 private:
     FFTUtils fftUtils;
+
+    TransientDetector tDetect;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrumFixerAudioProcessor)
 };

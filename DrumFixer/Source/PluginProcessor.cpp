@@ -124,6 +124,13 @@ void DrumFixerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuff
         {
             transDetected = true;
             fftUtils.processBlock (buffer);
+
+            auto curTransBufferSize = transientBuffer.getNumSamples();
+            transientBuffer.setSize (buffer.getNumChannels(),
+                curTransBufferSize + buffer.getNumSamples(), true);
+            
+            for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                transientBuffer.copyFrom (ch, curTransBufferSize, buffer, ch, 0, buffer.getNumSamples());
         }
         else if (transDetected)
         {
@@ -140,6 +147,9 @@ void DrumFixerAudioProcessor::toggleListening()
     {
         listening = true;
         transDetected = false;
+        
+        transientBuffer.clear();
+        transientBuffer.setSize (getNumInputChannels(), 0);
     }
     else // stop listening
     {
@@ -151,7 +161,10 @@ void DrumFixerAudioProcessor::toggleListening()
 
 void DrumFixerAudioProcessor::addDecayFilter (DecayFilter::Params& params)
 {
-    decayFilts.add (new DecayFilter (params));
+    if (transientBuffer.hasBeenCleared())
+        return;
+
+    decayFilts.add (new DecayFilter (params, transientBuffer, getSampleRate()));
 }
 
 bool DrumFixerAudioProcessor::hasEditor() const

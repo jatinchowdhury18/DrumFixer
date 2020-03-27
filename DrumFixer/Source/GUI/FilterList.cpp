@@ -4,14 +4,14 @@ FilterListComp::FilterListComp (DecayFilter& filt, FilterList* parentList) :
     filt (filt),
     parentList (parentList)
 {
-    auto setupLabel = [=] (Label& label, float& value)
+    auto setupLabel = [=, &filt] (Label& label, float& value)
     {
         addAndMakeVisible (label);
         label.setEditable (true);
-        label.onTextChange = [=, &value, &label]
+        label.onTextChange = [=, &value, &label, &filt]
         { 
             value = label.getText().getFloatValue();
-            // @TODO: tell filter to update from here...
+            filt.updateFilter();
             parentList->sendChangeMessage();
             updateLabels();
         };
@@ -19,8 +19,8 @@ FilterListComp::FilterListComp (DecayFilter& filt, FilterList* parentList) :
 
     auto& params = filt.getParams();
     setupLabel (freqLabel, params.centerFreq);
-    setupLabel (bwLabel, params.bandwidth);
-    setupLabel (tauLabel, params.desiredT60);
+    setupLabel (bwLabel,   params.bandwidth);
+    setupLabel (tauLabel,  params.desiredT60);
 
     updateLabels();
 

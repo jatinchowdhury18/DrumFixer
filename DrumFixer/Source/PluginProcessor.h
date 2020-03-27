@@ -54,6 +54,7 @@ private:
     TransientDetector tDetect;
     bool listening = false;
     bool transDetected = false;
+    AudioBuffer<float> transientBuffer;
 
     OwnedArray<DecayFilter> decayFilts;
 

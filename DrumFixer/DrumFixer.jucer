@@ -6,11 +6,22 @@
   <MAINGROUP id="gFEua7" name="DrumFixer">
     <GROUP id="{07456342-AEA9-751C-FB94-8215F1B80948}" name="Source">
       <GROUP id="{3A650E98-E3FD-ADD7-26E2-603C74D7D626}" name="DSP">
+        <GROUP id="{DE5F7F54-F7A9-BBC4-EC53-E428D5BA5473}" name="Filters">
+          <FILE id="Z7mOWu" name="Bell.h" compile="0" resource="0" file="Source/DSP/Filters/Bell.h"/>
+          <FILE id="q3YWAT" name="Biquad.cpp" compile="1" resource="0" file="Source/DSP/Filters/Biquad.cpp"/>
+          <FILE id="JTaJvN" name="Biquad.h" compile="0" resource="0" file="Source/DSP/Filters/Biquad.h"/>
+          <FILE id="rQf5lr" name="HPF.h" compile="0" resource="0" file="Source/DSP/Filters/HPF.h"/>
+          <FILE id="CphjxM" name="LPF.h" compile="0" resource="0" file="Source/DSP/Filters/LPF.h"/>
+          <FILE id="fE6DbM" name="ModeBandpass.cpp" compile="1" resource="0"
+                file="Source/DSP/Filters/ModeBandpass.cpp"/>
+          <FILE id="JVJ8uF" name="ModeBandpass.h" compile="0" resource="0" file="Source/DSP/Filters/ModeBandpass.h"/>
+        </GROUP>
         <GROUP id="{BA6B5720-9382-0D49-BBDD-3FE1F69BEAE2}" name="LevelDetectors">
           <FILE id="jeSPtP" name="BaseDetector.cpp" compile="1" resource="0"
                 file="Source/DSP/LevelDetectors/BaseDetector.cpp"/>
           <FILE id="YS7Yd1" name="BaseDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/BaseDetector.h"/>
           <FILE id="pa2QPp" name="PeakDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/PeakDetector.h"/>
+          <FILE id="WkHo4c" name="RMSDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/RMSDetector.h"/>
           <FILE id="G2Vvgn" name="TransientDetector.h" compile="0" resource="0"
                 file="Source/DSP/LevelDetectors/TransientDetector.h"/>
         </GROUP>

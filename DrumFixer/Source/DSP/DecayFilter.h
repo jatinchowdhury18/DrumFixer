@@ -27,7 +27,7 @@ public:
 
     DecayFilter (Params& params);
 
-    const Params& getParams() { return params; }
+    Params& getParams() { return params; }
 
 private:
     Params params;

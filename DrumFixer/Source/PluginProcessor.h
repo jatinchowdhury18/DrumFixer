@@ -46,7 +46,7 @@ public:
     void toggleListening();
 
     void addDecayFilter (DecayFilter::Params& params);
-    const OwnedArray<DecayFilter>& getDecayFilters() const { return decayFilts; }
+    OwnedArray<DecayFilter>& getDecayFilters() { return decayFilts; }
 
 private:
     FFTUtils fftUtils;

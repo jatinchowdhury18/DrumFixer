@@ -5,15 +5,21 @@ DrumFixerAudioProcessorEditor::DrumFixerAudioProcessorEditor (DrumFixerAudioProc
     AudioProcessorEditor (&p),
     processor (p),
     specgram (p.getFFT()),
-    overlay (p)
+    overlay (p),
+    filterList (p)
 {
     setSize (800, 450);
     
     processor.addChangeListener (this);
 
     addAndMakeVisible (specgram);
+
     addAndMakeVisible (overlay);
     overlay.setMouseCursor (MouseCursor::NoCursor);
+    overlay.addChangeListener (this);
+
+    addAndMakeVisible (filterList);
+    filterList.addChangeListener (this);
 
     addAndMakeVisible (listenButton);
     listenButton.onClick = [=] { listenButtonPressed(); };
@@ -35,6 +41,9 @@ void DrumFixerAudioProcessorEditor::resized()
     overlay.setBounds (specgram.getBounds());
 
     listenButton.setBounds (410, 10, 100, 30);
+
+    filterList.setBounds (410, 50, 380, getHeight() - 50 - 2*pad);
+    filterList.setRowHeight (30);
 }
 
 void DrumFixerAudioProcessorEditor::listenButtonPressed()
@@ -56,5 +65,15 @@ void DrumFixerAudioProcessorEditor::changeListenerCallback (ChangeBroadcaster* s
             specgram.drawSpecgram();
             listenButton.setButtonText ("Listen");
         }
+    }
+
+    if (source == &overlay)
+    {
+        filterList.updateContent();
+    }
+
+    if (source == &filterList)
+    {
+        overlay.repaint();
     }
 }

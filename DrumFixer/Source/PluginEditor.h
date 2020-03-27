@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 #include "GUI/SpectrogramComponent.h"
 #include "GUI/SpectrogramOverlay.h"
+#include "GUI/FilterList.h"
 
 class DrumFixerAudioProcessorEditor : public AudioProcessorEditor,
                                       private ChangeListener
@@ -24,6 +25,7 @@ private:
 
     SpectrogramComponent specgram;
     SpectrogramOverlay overlay;
+    FilterList filterList;
 
     TextButton listenButton { "Listen" };
 

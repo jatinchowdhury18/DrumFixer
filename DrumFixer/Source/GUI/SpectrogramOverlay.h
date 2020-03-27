@@ -4,7 +4,8 @@
 #include "../DSP/DecayFilter.h"
 #include "../PluginProcessor.h"
 
-class SpectrogramOverlay : public Component
+class SpectrogramOverlay : public Component,
+                           public ChangeBroadcaster
 {
 public:
     SpectrogramOverlay (DrumFixerAudioProcessor& p);

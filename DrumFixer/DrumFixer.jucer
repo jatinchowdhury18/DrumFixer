@@ -20,6 +20,8 @@
         <FILE id="worTzF" name="FFTUtils.h" compile="0" resource="0" file="Source/DSP/FFTUtils.h"/>
       </GROUP>
       <GROUP id="{2046BD53-9C38-822F-9D71-5F027597197A}" name="GUI">
+        <FILE id="MvpLY1" name="FilterList.cpp" compile="1" resource="0" file="Source/GUI/FilterList.cpp"/>
+        <FILE id="ZNvsH1" name="FilterList.h" compile="0" resource="0" file="Source/GUI/FilterList.h"/>
         <FILE id="pbfBOt" name="SpectrogramComponent.cpp" compile="1" resource="0"
               file="Source/GUI/SpectrogramComponent.cpp"/>
         <FILE id="j3ltYr" name="SpectrogramComponent.h" compile="0" resource="0"

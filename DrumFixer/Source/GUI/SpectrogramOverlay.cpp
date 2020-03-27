@@ -188,4 +188,5 @@ void SpectrogramOverlay::createNewFilter()
 
     DecayFilter::Params params (freqHz, widthHz, tauSeconds);
     proc.addDecayFilter (params);
+    sendChangeMessage();
 }

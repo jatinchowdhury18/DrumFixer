@@ -30,8 +30,9 @@ public:
     Params& getParams() { return params; }
     
     void updateFilter();
-    void prepare (double sampleRate);
+    void prepare (double sampleRate, int samplesPerBlock);
     void processBlock (AudioBuffer<float>& buffer);
+    void newTransient (int newSampleIdx) { sampleIdx = newSampleIdx; }
 
 private:
     float getActualT60 (Params& params, const AudioBuffer<float>& audio, double fs);
@@ -43,6 +44,11 @@ private:
 
     float sampleRate = 48000.0f;
     BellFilter bell[2];
+    AudioBuffer<float> filtBuffer;
+
+    int sampleIdx = -1;
+    float curGain[2] = { 0.0f, 0.0f };
+    float filtGain = 1.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DecayFilter)
 };

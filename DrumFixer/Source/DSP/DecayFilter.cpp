@@ -16,23 +16,74 @@ void DecayFilter::updateFilter()
 
     auto gainDes  = getGainForT60 (params.desiredT60, sampleRate);
     auto gainOrig = getGainForT60 (actualT60, sampleRate);
-    auto gFiltDB = Decibels::gainToDecibels (gainDes / gainOrig);
+    filtGain = gainDes / gainOrig;
 
     for (int ch = 0; ch < 2; ++ch)
-        bell[ch].calcCoefs (params.centerFreq, filterQ, gFiltDB);
+        bell[ch].calcCoefs (params.centerFreq, filterQ, -60.0f);
 }
 
-void DecayFilter::prepare (double fs)
+void DecayFilter::prepare (double fs, int samplesPerBlock)
 {
     sampleRate = (float) fs;
     updateFilter();
+
+    filtBuffer.setSize (2, samplesPerBlock);
 }
 
 void DecayFilter::processBlock (AudioBuffer<float>& buffer)
 {
+    if (curGain[0] == 0.0f && sampleIdx < 0) // nothing to do...
+        return;
+
+    // do processing
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+    {
+        filtBuffer.copyFrom (ch, 0, buffer, ch, 0, buffer.getNumSamples());
+        bell[ch].processBlock (filtBuffer.getWritePointer (ch), buffer.getNumSamples());
+    }
+
+    if (sampleIdx > 0) // new transient
+    {
+        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        {
+            auto* filtData = filtBuffer.getReadPointer (ch);
+            auto* xData = buffer.getWritePointer (ch);
+
+            curGain[ch] = 1.0f;
+            for (int n = sampleIdx; n < buffer.getNumSamples(); ++n)
+            {
+                xData[n] = filtData[n] * (1.0f - curGain[ch]) + xData[n] * curGain[ch];
+                curGain[ch] *= filtGain;
+            }
+        }
+
+        sampleIdx = -1;
+    }
+    else
+    {
+        // check if filter has been running for too long (and reset if it has)
+        if (curGain[0] < Decibels::decibelsToGain (-60.0f)
+            || curGain[0] > Decibels::decibelsToGain (30.0f))
+        {
+            curGain[0] = 0.0f; curGain[1] = 0.0f;
+            return;
+        }
+
+        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        {
+            auto* filtData = filtBuffer.getReadPointer (ch);
+            auto* xData = buffer.getWritePointer (ch);
+
+            for (int n = 0; n < buffer.getNumSamples(); ++n)
+            {
+                xData[n] = filtData[n] * (1.0f - curGain[ch]) + xData[n] * curGain[ch];
+                curGain[ch] *= filtGain;
+            }
+        }
+    }
 }
 
-float DecayFilter::getActualT60 (Params& params, const AudioBuffer<float>& audio, double fs)
+float DecayFilter::getActualT60 (Params& p, const AudioBuffer<float>& audio, double fs)
 {
     // set up analysis buffer
     auto nChannels = audio.getNumChannels();
@@ -42,7 +93,7 @@ float DecayFilter::getActualT60 (Params& params, const AudioBuffer<float>& audio
         analysisBuffer.addFrom (0, 0, audio, ch, 0, audio.getNumSamples(), 1.0f / (float) nChannels);
 
     // Filter around mode
-    ModeBandpass modeBPF (params.centerFreq, params.bandwidth, fs);
+    ModeBandpass modeBPF (p.centerFreq, p.bandwidth, fs);
     modeBPF.processBlock (analysisBuffer);
 
     // Do RMS level detection

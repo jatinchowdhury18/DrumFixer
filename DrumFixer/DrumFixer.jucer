@@ -22,6 +22,8 @@
           <FILE id="YS7Yd1" name="BaseDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/BaseDetector.h"/>
           <FILE id="pa2QPp" name="PeakDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/PeakDetector.h"/>
           <FILE id="WkHo4c" name="RMSDetector.h" compile="0" resource="0" file="Source/DSP/LevelDetectors/RMSDetector.h"/>
+          <FILE id="OuEF8f" name="TransientDetector.cpp" compile="1" resource="0"
+                file="Source/DSP/LevelDetectors/TransientDetector.cpp"/>
           <FILE id="G2Vvgn" name="TransientDetector.h" compile="0" resource="0"
                 file="Source/DSP/LevelDetectors/TransientDetector.h"/>
         </GROUP>

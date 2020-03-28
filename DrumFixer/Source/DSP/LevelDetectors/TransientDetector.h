@@ -8,52 +8,13 @@ class TransientDetector
 public:
     TransientDetector() {}
 
-    void prepare (double sampleRate, int nChannels, int nSamples)
-    {
-        for (int ch = 0; ch < 2; ++ch)
-        {
-            pDetect[ch].reset ((float) sampleRate);
-            pDetect[ch].setAttackMs (0.1f);
-            pDetect[ch].setReleaseMs (150.0f);
-        }
+    void prepare (double sampleRate, int nChannels, int nSamples);
+    void resetTransient();
 
-        detectBuffer.setSize (nChannels, nSamples);
-    }
+    int isTransientStarting (const AudioBuffer<float>& buffer);
+    bool isTransientInBuffer (const AudioBuffer<float>& buffer);
 
-    bool isTransientInBuffer (const AudioBuffer<float>& buffer)
-    {
-        detectBuffer.makeCopyOf (buffer, true);
-
-        for (int ch = 0; ch < detectBuffer.getNumChannels(); ++ch)
-        {
-            auto x = detectBuffer.getWritePointer (ch);
-            for (int n = 0; n < buffer.getNumSamples(); ++n)
-                x[n] = pDetect[ch].process (x[n]);
-        }
-
-        if (detectBuffer.getMagnitude (0, buffer.getNumSamples()) > 5*noiseFloor)
-        {
-            count = 0;
-            return true;
-        }
-
-        // update noise floor (moving avg of rms values)
-        float rms = 0.01f;
-        for (int ch = 0; ch < detectBuffer.getNumChannels(); ++ch)
-            rms = jmax (rms, detectBuffer.getRMSLevel (ch, 0, buffer.getNumSamples()));
-
-        noiseFloor -= noiseFloor / (float) movingAvgN;
-        noiseFloor += rms / (float) movingAvgN;
-
-        // if still in wait buffer, return true
-        if (count < countToWait)
-        {
-            count += buffer.getNumSamples();
-            return true;
-        }
-
-        return false;
-    }
+    void processDetectBuffer (const AudioBuffer<float>& buffer);
 
 private:
     AudioBuffer<float> detectBuffer;
@@ -64,6 +25,8 @@ private:
 
     const int countToWait = 8192;
     int count = countToWait;
+
+    bool inTransient = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransientDetector)
 };

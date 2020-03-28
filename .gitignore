@@ -13,3 +13,7 @@ JuceLibraryCode/
 
 # Visual Studio Code Files
 .vscode
+
+# Demo stuff
+*.mp4
+

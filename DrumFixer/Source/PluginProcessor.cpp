@@ -84,6 +84,9 @@ void DrumFixerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 {
     fftUtils.setSampleRate (getSampleRate());
     tDetect.prepare (sampleRate, getMainBusNumInputChannels(), samplesPerBlock);
+
+    for (auto filt : decayFilts)
+        filt->prepare (sampleRate, samplesPerBlock);
 }
 
 void DrumFixerAudioProcessor::releaseResources()
@@ -137,8 +140,19 @@ void DrumFixerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuff
             toggleListening();
         }
     }
+    else
+    {
+        int transSample = tDetect.isTransientStarting (buffer);
 
-    buffer.clear();
+        if (transSample >= 0)
+        {
+            for (auto filt : decayFilts)
+                filt->newTransient (transSample);
+        }
+
+        for (auto filt : decayFilts)
+            filt->processBlock (buffer);
+    }
 }
 
 void DrumFixerAudioProcessor::toggleListening()
@@ -149,7 +163,9 @@ void DrumFixerAudioProcessor::toggleListening()
         transDetected = false;
         
         transientBuffer.clear();
-        transientBuffer.setSize (getNumInputChannels(), 0);
+        transientBuffer.setSize (getMainBusNumInputChannels(), 0);
+
+        tDetect.resetTransient();
     }
     else // stop listening
     {
@@ -165,6 +181,7 @@ void DrumFixerAudioProcessor::addDecayFilter (DecayFilter::Params& params)
         return;
 
     decayFilts.add (new DecayFilter (params, transientBuffer, getSampleRate()));
+    decayFilts.getLast()->prepare (getSampleRate(), getBlockSize());
 }
 
 bool DrumFixerAudioProcessor::hasEditor() const

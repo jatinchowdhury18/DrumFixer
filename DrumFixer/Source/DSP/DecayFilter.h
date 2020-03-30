@@ -38,7 +38,12 @@ public:
     std::unique_ptr<XmlElement> toXml();
     static std::unique_ptr<DecayFilter> fromXml (XmlElement* xml);
 
+    bool isSelected() const noexcept { return selected; }
+    void setSelected (bool shouldBeSelected) { selected = shouldBeSelected; }
+
 private:
+    bool selected = false;
+
     static float getActualT60 (Params& params, const AudioBuffer<float>& audio, double fs);
     static float getSlope (const std::vector<float> x, const std::vector<float> y);
     static float getGainForT60 (float t60, float sampleRate);

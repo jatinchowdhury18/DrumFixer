@@ -1,8 +1,38 @@
 #include "FilterList.h"
 
+FilterListHeader::FilterListHeader()
+{
+    addAndMakeVisible (freqLabel);
+    freqLabel.setText ("Center Freq.", dontSendNotification);
+
+    addAndMakeVisible (bwLabel);
+    bwLabel.setText ("Bandwidth", dontSendNotification);
+
+    addAndMakeVisible (tauLabel);
+    tauLabel.setText ("Desired T60", dontSendNotification);
+
+    setSize (100, 30);
+}
+
+void FilterListHeader::resized()
+{
+    freqLabel.setBounds (0,                    0, 3 * getWidth() / 10, getHeight());
+    bwLabel.setBounds   (freqLabel.getRight(), 0, 3 * getWidth() / 10, getHeight());
+    tauLabel.setBounds  (bwLabel.getRight(),   0, 3 * getWidth() / 10, getHeight());
+}
+
+void FilterListHeader::paint (Graphics& g)
+{
+    g.fillAll (Colours::black);
+
+    g.setColour (Colours::white);
+    const auto y = (float) getHeight() - 2.0f;
+    g.drawLine (0.0f, y, (float) getWidth(), y);
+}
+
+//==================================================
 FilterListComp::FilterListComp (DecayFilter& filt, FilterList* parentList) :
-    filt (filt),
-    parentList (parentList)
+    filt (filt)
 {
     auto setupLabel = [=, &filt] (Label& label, float& value)
     {
@@ -30,16 +60,16 @@ FilterListComp::FilterListComp (DecayFilter& filt, FilterList* parentList) :
 void FilterListComp::updateLabels()
 {
     const auto& params = filt.getParams();
-    freqLabel.setText (String (params.centerFreq) + " Hz", dontSendNotification);
-    bwLabel.setText (String (params.bandwidth) + " Hz", dontSendNotification);
-    tauLabel.setText (String (params.desiredT60) + " sec", dontSendNotification);
+    freqLabel.setText (String (params.centerFreq, 2) + " Hz", dontSendNotification);
+    bwLabel.setText   (String (params.bandwidth , 2) + " Hz", dontSendNotification);
+    tauLabel.setText  (String (params.desiredT60, 4) + " sec", dontSendNotification);
 }
 
 void FilterListComp::resized()
 {
-    freqLabel.setBounds (0, 0, getWidth() / 4, getHeight());
-    bwLabel.setBounds (freqLabel.getRight(), 0, getWidth() / 4, getHeight());
-    tauLabel.setBounds (bwLabel.getRight(), 0, getWidth() / 4, getHeight());
+    freqLabel.setBounds (0,                    0, 3 * getWidth() / 10, getHeight());
+    bwLabel.setBounds   (freqLabel.getRight(), 0, 3 * getWidth() / 10, getHeight());
+    tauLabel.setBounds  (bwLabel.getRight(),   0, 3 * getWidth() / 10, getHeight());
 }
 
 //==================================================
@@ -47,18 +77,23 @@ FilterList::FilterList (DrumFixerAudioProcessor& p) :
     ListBox (String(), this),
     proc (p)
 {
+    setHeaderComponent (new FilterListHeader);
     setRowSelectedOnMouseDown (true);
+    setColour (ListBox::backgroundColourId, Colours::black);
 }
 
-void FilterList::paintListBoxItem (int row, Graphics& g, int width, int height, bool isSelected)
+void FilterList::paintListBoxItem (int /*row*/, Graphics& g, int width, int /*height*/, bool isSelected)
 {
     if (isSelected)
-        g.fillAll (Colours::darkred);
+        g.fillAll (Colours::green);
     else
         g.fillAll (Colours::black);
+
+    g.setColour (Colours::green.darker (isSelected ? 0.8f : 0.0f));
+    g.fillRect ((float) width - 20.0f, 10.0f, 10.0f, 10.0f);
 }
 
-Component* FilterList::refreshComponentForRow (int rowNum, bool isSelected, Component* comp)
+Component* FilterList::refreshComponentForRow (int rowNum, bool /*isSelected*/, Component* comp)
 {
     if (rowNum >= proc.getDecayFilters().size())
     {
@@ -89,4 +124,13 @@ void FilterList::deleteKeyPressed (int lastSelectedRow)
     proc.getDecayFilters().remove (lastSelectedRow, true);
     updateContent();
     sendChangeMessage();
+}
+
+void FilterList::selectedRowsChanged (int lastSelected)
+{
+    auto& filts = proc.getDecayFilters();
+    for (int i = 0; i < filts.size(); ++i)
+        filts[i]->setSelected (i == lastSelected);
+
+    getParentComponent()->repaint();
 }

@@ -8,7 +8,7 @@ DrumFixerAudioProcessorEditor::DrumFixerAudioProcessorEditor (DrumFixerAudioProc
     overlay (p),
     filterList (p)
 {
-    setSize (800, 450);
+    setSize (650, 450);
     
     processor.addChangeListener (this);
 
@@ -52,12 +52,12 @@ void DrumFixerAudioProcessorEditor::paint (Graphics& g)
 void DrumFixerAudioProcessorEditor::resized()
 {
     const int pad = 10;
-    specgram.setBounds (pad, pad, getWidth() / 2 - 2*pad, getHeight() - 2*pad);
+    specgram.setBounds (pad, pad, 400 - 2*pad, getHeight() - 2*pad);
     overlay.setBounds (specgram.getBounds());
 
     listenButton.setBounds (410, 10, 100, 30);
 
-    filterList.setBounds (410, 50, 380, getHeight() - 50 - 2*pad);
+    filterList.setBounds (400, 50, 240, getHeight() - 50 - 2*pad);
     filterList.setRowHeight (30);
 }
 

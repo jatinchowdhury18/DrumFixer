@@ -35,7 +35,7 @@ void SpectrogramOverlay::drawWidthLine (Graphics& g, float top, float center, fl
 
 void SpectrogramOverlay::drawCursor (Graphics& g)
 {
-    g.setColour (Colours::lightblue);
+    g.setColour (Colour (0xff04d9ff));
     if (state == ChooseFreq)
     {
         if (mouseY > 0.0f)
@@ -61,11 +61,11 @@ void SpectrogramOverlay::drawCursor (Graphics& g)
 
 void SpectrogramOverlay::drawFilters (Graphics& g)
 {
-    g.setColour (Colours::lightgrey);
-
     auto& filters = proc.getDecayFilters();
-    for (auto& filt : filters)
+    for (auto filt : filters)
     {
+        g.setColour (filt->isSelected() ? Colours::green.brighter() : Colours::lightgrey);
+
         auto& params = filt->getParams();
         auto filtY = (float) FFTUtils::freqToY (params.centerFreq, (float) getHeight());
         auto tauX = getXForTau (params.desiredT60);
@@ -137,13 +137,13 @@ float SpectrogramOverlay::getXForTau (float tau)
 
 float SpectrogramOverlay::getWidthForY (float y, float center)
 {
-    return 2.0f * jmax (FFTUtils::yToFreq (y, (float) getHeight())
+    return jmax (FFTUtils::yToFreq (y, (float) getHeight())
         - FFTUtils::yToFreq (center, (float) getHeight()), 0.0f);
 }
 
 float SpectrogramOverlay::getYForWidth (float bandwidth, float centerFreq)
 {
-    return (float) FFTUtils::freqToY((bandwidth / 2.0f) + centerFreq, (float) getHeight());
+    return (float) FFTUtils::freqToY((bandwidth) + centerFreq, (float) getHeight());
 }
 
 void SpectrogramOverlay::updateLabel()

@@ -40,7 +40,7 @@ std::unique_ptr<DecayFilter> DecayFilter::fromXml (XmlElement* xml)
 
 void DecayFilter::updateFilter()
 {
-    auto filterQ = params.centerFreq / params.bandwidth;
+    auto filterQ = params.centerFreq / jmax (params.bandwidth, 0.1f);
 
     auto gainDes  = getGainForT60 (params.desiredT60, sampleRate);
     auto gainOrig = getGainForT60 (actualT60, sampleRate);

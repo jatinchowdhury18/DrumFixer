@@ -48,6 +48,8 @@ public:
     void addDecayFilter (DecayFilter::Params& params);
     OwnedArray<DecayFilter>& getDecayFilters() { return decayFilts; }
 
+    Image specgramImage;
+
 private:
     FFTUtils fftUtils;
 
@@ -55,6 +57,7 @@ private:
     bool listening = false;
     bool transDetected = false;
     AudioBuffer<float> transientBuffer;
+    double transientSampleRate = 48000.0;
 
     OwnedArray<DecayFilter> decayFilts;
 

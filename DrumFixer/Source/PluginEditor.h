@@ -16,6 +16,9 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+    void reload();
+    void getSpectrogramImage();
+
     void listenButtonPressed();
 
     void changeListenerCallback (ChangeBroadcaster* source);

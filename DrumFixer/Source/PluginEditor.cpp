@@ -23,10 +23,25 @@ DrumFixerAudioProcessorEditor::DrumFixerAudioProcessorEditor (DrumFixerAudioProc
 
     addAndMakeVisible (listenButton);
     listenButton.onClick = [=] { listenButtonPressed(); };
+
+    reload();
 }
 
 DrumFixerAudioProcessorEditor::~DrumFixerAudioProcessorEditor()
 {
+    getSpectrogramImage();
+}
+
+void DrumFixerAudioProcessorEditor::reload()
+{
+    specgram.setImage (processor.specgramImage);
+    filterList.updateContent();
+    repaint();
+}
+
+void DrumFixerAudioProcessorEditor::getSpectrogramImage()
+{
+    processor.specgramImage = specgram.getImageCopy();
 }
 
 void DrumFixerAudioProcessorEditor::paint (Graphics& g)

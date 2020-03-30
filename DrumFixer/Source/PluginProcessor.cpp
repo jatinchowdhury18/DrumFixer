@@ -170,6 +170,7 @@ void DrumFixerAudioProcessor::toggleListening()
     else // stop listening
     {
         listening = false;
+        transientSampleRate = getSampleRate();
     }
 
     sendChangeMessage();
@@ -180,7 +181,7 @@ void DrumFixerAudioProcessor::addDecayFilter (DecayFilter::Params& params)
     if (transientBuffer.hasBeenCleared())
         return;
 
-    decayFilts.add (new DecayFilter (params, transientBuffer, getSampleRate()));
+    decayFilts.add (new DecayFilter (params, transientBuffer, transientSampleRate));
     decayFilts.getLast()->prepare (getSampleRate(), getBlockSize());
 }
 
@@ -196,15 +197,97 @@ AudioProcessorEditor* DrumFixerAudioProcessor::createEditor()
 
 void DrumFixerAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    // create root xml element
+    auto xmlState = std::make_unique<XmlElement> ("PluginState");
+
+    // save spectrogram image to file
+    if (auto editor = dynamic_cast<DrumFixerAudioProcessorEditor*> (getActiveEditor()))
+        editor->getSpectrogramImage();
+
+    if (specgramImage.isValid())
+    {
+        File specgramFile = File::getSpecialLocation (File::userApplicationDataDirectory)
+            .getChildFile ("DrumFixer")
+            .getChildFile ("Spectrograms")
+            .getNonexistentChildFile ("specgram", ".png", false);
+        specgramFile.create();
+
+        FileOutputStream fStream (specgramFile);
+        PNGImageFormat png;
+        png.writeImageToStream (specgramImage, fStream);
+        xmlState->setAttribute ("Spectrogram", specgramFile.getFullPathName());
+    }
+
+    // save transient buffer to file
+    if (! transientBuffer.hasBeenCleared() && transientBuffer.getNumChannels() > 0)
+    {
+        File transientFile = File::getSpecialLocation (File::userApplicationDataDirectory)
+            .getChildFile ("DrumFixer")
+            .getChildFile ("Transients")
+            .getNonexistentChildFile ("transient", ".wav", false);
+        transientFile.create();
+
+        WavAudioFormat wav;
+        std::unique_ptr<AudioFormatWriter> writer (wav
+            .createWriterFor (new FileOutputStream (transientFile), transientSampleRate,
+                              transientBuffer.getNumChannels(), 16, {}, 0));
+        writer->writeFromAudioSampleBuffer (transientBuffer, 0, transientBuffer.getNumSamples());
+        xmlState->setAttribute ("Transient", transientFile.getFullPathName());
+    }
+
+    // save decay filters
+    auto filtersXml = std::make_unique<XmlElement> ("Filters");
+    int i = 0;
+    for (auto filt : decayFilts)
+    {
+        auto filtXml = filt->toXml();
+        filtXml->setTagName ("DecayFilter" + String (i++));
+        filtersXml->addChildElement (filtXml.release());
+    }
+
+    xmlState->addChildElement (filtersXml.release());
+
+    // write XML to file
+    copyXmlToBinary (*xmlState.get(), destData);
 }
 
 void DrumFixerAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    // read XML from file
+    auto xmlState = getXmlFromBinary (data, sizeInBytes);
+    
+    // read spectrogram image
+    if (xmlState->hasAttribute ("Spectrogram"))
+    {
+        auto specgramFile = File (xmlState->getStringAttribute ("Spectrogram"));
+        specgramImage = PNGImageFormat::loadFrom (specgramFile);
+    }
+
+    // read transient file
+    if (xmlState->hasAttribute ("Transient"))
+    {
+        transientSampleRate = xmlState->getDoubleAttribute ("SampleRate");
+
+        auto transientFile = File (xmlState->getStringAttribute ("Transient"));
+        WavAudioFormat wav;
+        std::unique_ptr<AudioFormatReader> reader (wav
+            .createReaderFor (new FileInputStream (transientFile), true));
+
+        transientBuffer.setSize (reader->numChannels, reader->lengthInSamples);
+        reader->read (&transientBuffer, 0, reader->lengthInSamples, 0, true, true);
+        transientSampleRate = reader->sampleRate;
+    }
+
+    // load decay filters
+    decayFilts.clear();
+    if (auto filtersXml = xmlState->getChildByName ("Filters"))
+    {
+        forEachXmlChildElement (*filtersXml, filtXml)
+            decayFilts.add (DecayFilter::fromXml (filtXml));
+    }
+
+    if (auto editor = dynamic_cast<DrumFixerAudioProcessorEditor*> (getActiveEditor()))
+        editor->reload();
 }
 
 // This creates new instances of the plugin..

@@ -13,6 +13,9 @@ public:
     void clear();
     void drawSpecgram();
 
+    Image getImageCopy();
+    void setImage (Image image);
+
 private:
     void timerCallback() override;
 

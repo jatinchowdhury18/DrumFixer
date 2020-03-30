@@ -45,3 +45,17 @@ void SpectrogramComponent::paint (Graphics& g)
     if (spectrogramImage.get() != nullptr)
         g.drawImage (*spectrogramImage.get(), getLocalBounds().toFloat());
 }
+
+Image SpectrogramComponent::getImageCopy()
+{
+    if (spectrogramImage.get() == nullptr)
+        return Image();
+
+    return spectrogramImage->createCopy();
+}
+
+void SpectrogramComponent::setImage (Image image)
+{
+    if (image.isValid())
+        spectrogramImage = std::make_unique<Image> (image);
+}

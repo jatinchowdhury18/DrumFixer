@@ -26,6 +26,7 @@ public:
     };
 
     DecayFilter (Params& params, const AudioBuffer<float>& audio, double fs);
+    DecayFilter (Params& params, float aT60);
 
     Params& getParams() { return params; }
     
@@ -34,8 +35,11 @@ public:
     void processBlock (AudioBuffer<float>& buffer);
     void newTransient (int newSampleIdx) { sampleIdx = newSampleIdx; }
 
+    std::unique_ptr<XmlElement> toXml();
+    static std::unique_ptr<DecayFilter> fromXml (XmlElement* xml);
+
 private:
-    float getActualT60 (Params& params, const AudioBuffer<float>& audio, double fs);
+    static float getActualT60 (Params& params, const AudioBuffer<float>& audio, double fs);
     static float getSlope (const std::vector<float> x, const std::vector<float> y);
     static float getGainForT60 (float t60, float sampleRate);
 

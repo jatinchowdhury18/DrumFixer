@@ -14,6 +14,7 @@ public:
 
     static float yToFreq (float y, float height);
     static int freqToY (float freq, float height);
+    Colour getInfernoColour (float level);
 
     bool isFFTReady() { return nextFFTBlockReady; }
     void drawNextLineOfSpectrogram (Array<Colour>& data, int height);

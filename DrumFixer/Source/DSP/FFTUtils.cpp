@@ -63,11 +63,17 @@ void FFTUtils::drawNextLineOfSpectrogram (Array<Colour>& data, int height)
         auto interp = upper * frac + lower * (1.0f - frac);
 
         auto level = jmap (interp, minDB, 0.0f, 0.0f, 1.0f);
-        auto colourVals = inferno[int (level * 256)];
-        data.add (Colour::fromFloatRGBA (colourVals[0], colourVals[1], colourVals[2], 1.0f));
+        // auto colourVals = inferno[int (level * 256)];
+        data.add (getInfernoColour (level));
     }
 
     nextFFTBlockReady = false;
+}
+
+Colour FFTUtils::getInfernoColour (float level)
+{
+    auto colourVals = inferno[int (level * 256)];
+    return Colour::fromFloatRGBA (colourVals[0], colourVals[1], colourVals[2], 1.0f);
 }
 
 float FFTUtils::yToFreq (float y, float height)

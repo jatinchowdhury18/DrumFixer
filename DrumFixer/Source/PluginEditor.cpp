@@ -47,18 +47,28 @@ void DrumFixerAudioProcessorEditor::getSpectrogramImage()
 void DrumFixerAudioProcessorEditor::paint (Graphics& g)
 {
     g.fillAll (Colours::black);
+
+    auto& fftUtils = processor.getFFT();
+    g.setGradientFill (ColourGradient (fftUtils.getInfernoColour (0.88f), 5, 5,
+        fftUtils.getInfernoColour (0.25f), 250, 50, false));
+
+    GlyphArrangement ga;
+    ga.addLineOfText (Font (45.0f).boldened(), "DrumFixer", 5, 40);
+    Path p;
+    ga.createPath (p);
+    g.fillPath (p);
 }
 
 void DrumFixerAudioProcessorEditor::resized()
 {
     const int pad = 10;
-    specgram.setBounds (pad, pad, 400 - 2*pad, getHeight() - 2*pad);
-    overlay.setBounds (specgram.getBounds());
-
-    listenButton.setBounds (410, 10, 100, 30);
-
-    filterList.setBounds (400, 50, 240, getHeight() - 50 - 2*pad);
+    filterList.setBounds (pad, 100, 240, getHeight() - 50 - 2*pad);
     filterList.setRowHeight (30);
+
+    listenButton.setBounds (75, 60, 100, 30);
+
+    specgram.setBounds (260, pad, 400 - 2*pad, getHeight() - 2*pad);
+    overlay.setBounds (specgram.getBounds());
 }
 
 void DrumFixerAudioProcessorEditor::listenButtonPressed()

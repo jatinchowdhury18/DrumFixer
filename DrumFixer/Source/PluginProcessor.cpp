@@ -171,6 +171,9 @@ void DrumFixerAudioProcessor::toggleListening()
     {
         listening = false;
         transientSampleRate = getSampleRate();
+
+        for (auto* filt : decayFilts)
+            filt->updateFilter();
     }
 
     sendChangeMessage();
@@ -283,7 +286,7 @@ void DrumFixerAudioProcessor::setStateInformation (const void* data, int sizeInB
     if (auto filtersXml = xmlState->getChildByName ("Filters"))
     {
         forEachXmlChildElement (*filtersXml, filtXml)
-            decayFilts.add (DecayFilter::fromXml (filtXml));
+            decayFilts.add (DecayFilter::fromXml (filtXml, transientBuffer, transientSampleRate));
     }
 
     if (auto editor = dynamic_cast<DrumFixerAudioProcessorEditor*> (getActiveEditor()))

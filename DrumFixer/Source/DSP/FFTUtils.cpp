@@ -2,7 +2,7 @@
 
 namespace
 {
-    constexpr float lowFreq = 40.0f;
+    constexpr float lowFreq = 50.0f;
     constexpr float highFreq = 20000.0f;
 };
 
@@ -63,7 +63,6 @@ void FFTUtils::drawNextLineOfSpectrogram (Array<Colour>& data, int height)
         auto interp = upper * frac + lower * (1.0f - frac);
 
         auto level = jmap (interp, minDB, 0.0f, 0.0f, 1.0f);
-        // auto colourVals = inferno[int (level * 256)];
         data.add (getInfernoColour (level));
     }
 

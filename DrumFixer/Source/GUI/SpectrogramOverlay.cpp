@@ -64,7 +64,7 @@ void SpectrogramOverlay::drawFilters (Graphics& g)
     auto& filters = proc.getDecayFilters();
     for (auto filt : filters)
     {
-        g.setColour (filt->isSelected() ? Colours::green.brighter() : Colours::lightgrey);
+        g.setColour (filt->isSelected() ? Colours::green.brighter() : Colour (0xff04d9ff).darker (0.4f));
 
         auto& params = filt->getParams();
         auto filtY = (float) FFTUtils::freqToY (params.centerFreq, (float) getHeight());

@@ -26,7 +26,6 @@ public:
     };
 
     DecayFilter (Params& params, const AudioBuffer<float>& audio, double fs);
-    DecayFilter (Params& params, float aT60);
 
     Params& getParams() { return params; }
     
@@ -36,7 +35,7 @@ public:
     void newTransient (int newSampleIdx) { sampleIdx = newSampleIdx; }
 
     std::unique_ptr<XmlElement> toXml();
-    static std::unique_ptr<DecayFilter> fromXml (XmlElement* xml);
+    static std::unique_ptr<DecayFilter> fromXml (XmlElement* xml, const AudioBuffer<float>& buffer, float fs);
 
     bool isSelected() const noexcept { return selected; }
     void setSelected (bool shouldBeSelected) { selected = shouldBeSelected; }
@@ -49,7 +48,9 @@ private:
     static float getGainForT60 (float t60, float sampleRate);
 
     Params params;
-    const float actualT60;
+    float actualT60;
+    const float sampleFs = 48000.0f;
+    const AudioBuffer<float>& sampleBuffer;
 
     float sampleRate = 48000.0f;
     BellFilter bell[2];

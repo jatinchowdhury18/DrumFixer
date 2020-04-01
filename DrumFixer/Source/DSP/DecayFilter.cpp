@@ -4,13 +4,9 @@
 #include <numeric>
 
 DecayFilter::DecayFilter (Params& params, const AudioBuffer<float>& audio, double fs) :
-    DecayFilter (params, getActualT60 (params, audio, fs))
-{
-}
-
-DecayFilter::DecayFilter (Params& params, float aT60) :
     params (params),
-    actualT60 (aT60)
+    sampleBuffer (audio),
+    sampleFs (fs)
 {
     updateFilter();
 }
@@ -22,24 +18,23 @@ std::unique_ptr<XmlElement> DecayFilter::toXml()
     filterXml->setAttribute ("CenterFreq", params.centerFreq);
     filterXml->setAttribute ("Bandwidth", params.bandwidth);
     filterXml->setAttribute ("DesiredT60", params.desiredT60);
-    filterXml->setAttribute ("ActualT60", actualT60);
 
     return filterXml;
 }
 
-std::unique_ptr<DecayFilter> DecayFilter::fromXml (XmlElement* xml)
+std::unique_ptr<DecayFilter> DecayFilter::fromXml (XmlElement* xml, const AudioBuffer<float>& buffer, float fs)
 {
     auto fc = (float) xml->getDoubleAttribute ("CenterFreq");
     auto bw = (float) xml->getDoubleAttribute ("Bandwidth");
     auto dt60 = (float) xml->getDoubleAttribute ("DesiredT60");
-    auto at60 = (float) xml->getDoubleAttribute ("ActualT60");
 
     Params params (fc, bw, dt60);
-    return std::make_unique<DecayFilter> (params, at60);
+    return std::make_unique<DecayFilter> (params, buffer, fs);
 }
 
 void DecayFilter::updateFilter()
 {
+    actualT60 = getActualT60 (params, sampleBuffer, sampleFs);
     auto filterQ = params.centerFreq / jmax (params.bandwidth, 0.1f);
 
     auto gainDes  = getGainForT60 (params.desiredT60, sampleRate);
@@ -113,6 +108,9 @@ void DecayFilter::processBlock (AudioBuffer<float>& buffer)
 
 float DecayFilter::getActualT60 (Params& p, const AudioBuffer<float>& audio, double fs)
 {
+    if (audio.hasBeenCleared())
+        return 0.1f;
+
     // set up analysis buffer
     auto nChannels = audio.getNumChannels();
     AudioBuffer<float> analysisBuffer;

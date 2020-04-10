@@ -40,7 +40,7 @@ new drum hit is detected passing through the plugin, the filter
 dynamically adjusts the gain of the frequencies being processed
 by the filter to apply the damping effect to the drum sound.
 
-![](../Drum_Fixing/Screenshots/PlotBell.gif)
+![](./Screenshots/PlotBell.gif)
 
 For a more in-depth explanation, feel free to checkout this
 [`python` Notebook](https://ccrma.stanford.edu/~jatin/DrumFixer.html).

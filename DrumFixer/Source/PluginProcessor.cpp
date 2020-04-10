@@ -276,8 +276,8 @@ void DrumFixerAudioProcessor::setStateInformation (const void* data, int sizeInB
         std::unique_ptr<AudioFormatReader> reader (wav
             .createReaderFor (new FileInputStream (transientFile), true));
 
-        transientBuffer.setSize (reader->numChannels, reader->lengthInSamples);
-        reader->read (&transientBuffer, 0, reader->lengthInSamples, 0, true, true);
+        transientBuffer.setSize (reader->numChannels, (int) reader->lengthInSamples);
+        reader->read (&transientBuffer, 0, (int) reader->lengthInSamples, 0, true, true);
         transientSampleRate = reader->sampleRate;
     }
 
@@ -286,7 +286,7 @@ void DrumFixerAudioProcessor::setStateInformation (const void* data, int sizeInB
     if (auto filtersXml = xmlState->getChildByName ("Filters"))
     {
         forEachXmlChildElement (*filtersXml, filtXml)
-            decayFilts.add (DecayFilter::fromXml (filtXml, transientBuffer, transientSampleRate));
+            decayFilts.add (DecayFilter::fromXml (filtXml, transientBuffer, (float) transientSampleRate));
     }
 
     if (auto editor = dynamic_cast<DrumFixerAudioProcessorEditor*> (getActiveEditor()))

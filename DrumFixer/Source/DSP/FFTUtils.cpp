@@ -47,7 +47,7 @@ void FFTUtils::drawNextLineOfSpectrogram (Array<Colour>& data, int height)
 
     // render FFT data...
     forwardFFT.performFrequencyOnlyForwardTransform (fftData);
-    const float minDB = -100.0f;
+    const float minDB = -60.0f;
     for (int k = 0; k < fftSize/2; ++k)
         fftDataDB[k] = Decibels::gainToDecibels (fftData[k] / 200, minDB);
 

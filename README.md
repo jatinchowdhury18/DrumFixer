@@ -40,9 +40,19 @@ new drum hit is detected passing through the plugin, the filter
 dynamically adjusts the gain of the frequencies being processed
 by the filter to apply the damping effect to the drum sound.
 
+![](../Drum_Fixing/Screenshots/PlotBell.gif)
+
+For a more in-depth explanation, feel free to checkout this
+[`python` Notebook](https://ccrma.stanford.edu/~jatin/DrumFixer.html).
+
+## Acknowledgements
+
+The original idea for this plugin was developed by Mark Rau, and 
+inspired by the GASP working group at [CCRMA](ccrma.stanford.edu).
+
 ## License
 
-The code in the repository is licensed under the GPLv3.
+The code in this repository is licensed under the GPLv3.
 The audio samples in the `Snares/` folder are licensed under
 the Creative Commons License. For more information, see
 [`Snares/_readme_and_license.txt`](Snares/_readme_and_license.txt).

@@ -22,7 +22,7 @@ public:
 private:
     enum
     {
-        fftOrder = 11,
+        fftOrder = 10,
         fftSize  = 1 << fftOrder
     };
 

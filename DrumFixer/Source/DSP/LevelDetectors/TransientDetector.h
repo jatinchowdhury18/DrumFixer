@@ -23,7 +23,7 @@ private:
     float noiseFloor = Decibels::decibelsToGain (0.0f);
     const int movingAvgN = 20;
 
-    const int countToWait = 8192;
+    const int countToWait = 2048;
     int count = countToWait;
 
     bool inTransient = false;

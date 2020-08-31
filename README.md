@@ -43,7 +43,7 @@ by the filter to apply the damping effect to the drum sound.
 ![](./Screenshots/PlotBell.gif)
 
 For a more in-depth explanation, feel free to checkout this
-[`python` Notebook](https://ccrma.stanford.edu/~jatin/DrumFixer.html).
+[`python` Notebook](https://ccrma.stanford.edu/~jatin/Notebooks/DrumFixer.html).
 
 ## Acknowledgements
 
